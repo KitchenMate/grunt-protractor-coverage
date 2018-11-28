@@ -17,6 +17,9 @@ var tmp = require('temporary');
 var esprima=require('esprima');
 var estraverse=require('estraverse');
 var escodegen=require('escodegen');
+var coffee = require('coffee-script');
+var sourceMapToAst = require('sourcemap-to-ast);
+                             
 module.exports = function(grunt) {
   function resolvePath(filename, paths){
     var filepaths=paths.map(function(p){
@@ -30,7 +33,10 @@ module.exports = function(grunt) {
   }
   function instrumentSpecFile(payload, file, configDir){
     var code= grunt.file.read(file);
-    var ast=esprima.parse(code);
+    var compiled = coffee.compile(code, {sourceMap: true});
+    var ast = esprima.parse(compiled.js, {loc: true, source: file})
+    sourceMapToAst(ast, compiled.v3SourceMap);
+    
     if(!ast){
       return;
     }
